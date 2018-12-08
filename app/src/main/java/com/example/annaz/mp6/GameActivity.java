@@ -28,22 +28,19 @@ public class GameActivity extends AppCompatActivity {
     private boolean timerHasEnded;
     private int score;
 
-    /*@Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
-    }*/
-
     public void guessFunction(View v) { //previously titled "launchScoreScreen"
         Intent i = new Intent(this, scoreScreen.class);
+        i.putExtra("score", score); //passes score to the next screen
 
 
         if (answerIsCorrect("rihanna")) {
-            String celebURL = getURL();
+            String celebURL = getAPIURL("Rihanna"); //make sure it's capitalized and has spaces if necessary!
             startAPICall(celebURL);
             TextView scoreLabel = findViewById(R.id.scoreLabel);
             score++;
             scoreLabel.setText("Score: " + score);
+
+        } else {
 
         }
 
@@ -60,8 +57,11 @@ public class GameActivity extends AppCompatActivity {
         return true;
     }
 
-    public String getURL() {
-        return "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=Rihanna";
+    public String getAPIURL(String celeb) {
+
+
+
+        return "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=" + celeb;
 
     }
 
@@ -118,50 +118,38 @@ public class GameActivity extends AppCompatActivity {
             answerLabel.setText("we messed up"); //why doesn't this do anything???
 
         }
-
-        //TextView answerLabel = findViewById(R.id.answerLabel);
-        //answerLabel.setText(jsonObjectRequest.get("continue").toString());
-
-        
     }
 
     void getImageURL(JSONObject object) {
         TextView answerLabel = findViewById(R.id.answerLabel);
 
         try {
-            //myObj.cars.car2;
+            //the JSONObject that we get from Wikipedia is reallllllllly nested, so I made a bunch
+            //of JSONObjects to access the URL that we want.
             JSONObject queryObject = object.getJSONObject("query");
             JSONObject pagesObject = queryObject.getJSONObject("pages");
-            //String pageNumber = pagesObject.getString("pages"); //can't do this
             String pageNumber = pagesObject.names().toString();
-
             pageNumber = pageNumber.substring(2, pageNumber.length() - 2);
             answerLabel.setText(pageNumber);
             JSONObject pageNumberObject = pagesObject.getJSONObject(pageNumber);
-
             JSONObject originalObject = pageNumberObject.getJSONObject("original");
             String imageURL = originalObject.getString("source");
-
             answerLabel.setText(imageURL);
 
             //upload image to image view
-
             ImageView imageView = findViewById(R.id.celebImageView);
             uploadCelebImage(imageURL, imageView);
 
-
-
-
-
-            //imageView.setImageBitmap();
 
         } catch(Exception e) {
             answerLabel.setText("none");
         }
     }
 
-
-//modified code from https://stackoverflow.com/questions/48379771/android-volley-api-imagerequest-is-not-working
+    /*
+    ** changes image view to image of current celebrity.
+     */
+    //modified code from https://stackoverflow.com/questions/48379771/android-volley-api-imagerequest-is-not-working
     public void uploadCelebImage(String url, final ImageView imageView) {
 
         ImageRequest imageRequest = new ImageRequest(url,
@@ -170,7 +158,7 @@ public class GameActivity extends AppCompatActivity {
                     public void onResponse(Bitmap response) {
                         imageView.setImageBitmap(response);
                         TextView answerLabel = findViewById(R.id.answerLabel);
-                        answerLabel.setText("I didn't mess up");
+                        //answerLabel.setText("I didn't mess up");
 
                     }
                 }, 700,700, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
@@ -203,31 +191,11 @@ public class GameActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-
         //set up a queue for our Volley requests
-
         requestQueue = Volley.newRequestQueue(this);
 
         //Load main layout
         setContentView(R.layout.activity_game);
-
-//        //attach handler to UI button
-//
-//        final Button startAPICall = findViewById(R.id.startAPICall);
-//
-//        startAPICall.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(final View v) {
-//
-//                Log.d(TAG, "Start API button clicked");
-//                startAPICall();
-//            }
-//
-//        });
-
-        //make sure progress bar isn’t spinning (deleted)
-
     }
 
 
