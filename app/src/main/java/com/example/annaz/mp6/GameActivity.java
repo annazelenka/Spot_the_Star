@@ -42,13 +42,25 @@ public class GameActivity extends AppCompatActivity {
     private static RequestQueue requestQueue;
 
     void startAPICall() {
-        String celebURL = "https://en.wikipedia.org/w/api.php?action=query&titles=Albert%20Einstein&format=json&prop=images";
+        String celebURL =
+                "https://en.wikipedia.org/" +
+                        "w/api.php?action=query&titles=Albert%20Einstein&format=json&prop=images";
+        String celebURL2 = "https://en.wikipedia.org/w/api.php?action=query" +
+                "&prop=pageimages&format=json&piprop=original&titles=Albert%20Einstein";
+
+        //change height by changing 60!!
+        String celebURL3 = "https://en.wikipedia.org/w/api.php?action=query&format=" +
+                "json&formatversion=2&prop=pageimages|pageterms&piprop=thumbnail&pithumbsize=" +
+
+                //60 = current height!
+                "60&titles=Albert%20Einstein";
+
 
         try {
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    celebURL, //original: url: "",
+                    celebURL2, //original: url: "",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -86,8 +98,23 @@ public class GameActivity extends AppCompatActivity {
             JSONObject pagesObject = queryObject.getJSONObject("pages");
             //String pageNumber = pagesObject.getString("pages"); //can't do this
             String pageNumber = pagesObject.names().toString();
-            pageNumber = pageNumber.substring(1, pageNumber.length() - 1);
+
+            pageNumber = pageNumber.substring(2, pageNumber.length() - 2);
             answerLabel.setText(pageNumber);
+            JSONObject pageNumberObject = pagesObject.getJSONObject(pageNumber);
+
+            JSONObject originalObject = pageNumberObject.getJSONObject("original");
+            String imageURL = originalObject.getString("source");
+
+            answerLabel.setText(imageURL);
+
+            //upload image to image view
+
+            ImageView imageView = findViewById(R.id.celebImageView);
+
+            
+
+            //imageView.setImageBitmap();
 
         } catch(Exception e) {
             answerLabel.setText("none");
