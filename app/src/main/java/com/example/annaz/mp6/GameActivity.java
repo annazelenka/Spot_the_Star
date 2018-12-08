@@ -9,7 +9,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
-
+import 	android.graphics.Bitmap;
 
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
@@ -17,10 +17,16 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.ImageRequest;
+
+
 
 import org.json.JSONObject;
 
 public class GameActivity extends AppCompatActivity {
+
+    private boolean timerHasEnded;
+    private int score;
 
     /*@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +34,39 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
     }*/
 
-    public void launchScoreScreen(View v) {
+    public void guessFunction(View v) { //previously titled "launchScoreScreen"
         Intent i = new Intent(this, scoreScreen.class);
-        startActivity(i);
+
+
+        if (answerIsCorrect("rihanna")) {
+            String celebURL = getURL();
+            startAPICall(celebURL);
+            TextView scoreLabel = findViewById(R.id.scoreLabel);
+            score++;
+            scoreLabel.setText("Score: " + score);
+
+        }
+
+        //startActivity(i);
+
+        if (timerHasEnded) { //Anna: eventually maybe we should delete this and just launch the next screen when the timer ends
+            startActivity(i);
+        }
+
 
     }
+
+    public boolean answerIsCorrect(String answer) {
+        return true;
+    }
+
+    public String getURL() {
+        return "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=Rihanna";
+
+    }
+
+
+
 
 
     private static final String TAG = "Lab12:Main";
@@ -41,8 +75,8 @@ public class GameActivity extends AppCompatActivity {
 
     private static RequestQueue requestQueue;
 
-    void startAPICall() {
-        String celebURL =
+    void startAPICall(String celebURL) {
+        String celebURL4 =
                 "https://en.wikipedia.org/" +
                         "w/api.php?action=query&titles=Albert%20Einstein&format=json&prop=images";
         String celebURL2 = "https://en.wikipedia.org/w/api.php?action=query" +
@@ -55,12 +89,14 @@ public class GameActivity extends AppCompatActivity {
                 //60 = current height!
                 "60&titles=Albert%20Einstein";
 
+        String rihannaURL = "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=Rihanna";
+
 
         try {
 
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                     Request.Method.GET,
-                    celebURL2, //original: url: "",
+                    celebURL, //original: url: "",
                     null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -111,8 +147,11 @@ public class GameActivity extends AppCompatActivity {
             //upload image to image view
 
             ImageView imageView = findViewById(R.id.celebImageView);
+            uploadCelebImage(imageURL, imageView);
 
-            
+
+
+
 
             //imageView.setImageBitmap();
 
@@ -120,6 +159,39 @@ public class GameActivity extends AppCompatActivity {
             answerLabel.setText("none");
         }
     }
+
+
+//modified code from https://stackoverflow.com/questions/48379771/android-volley-api-imagerequest-is-not-working
+    public void uploadCelebImage(String url, final ImageView imageView) {
+
+        ImageRequest imageRequest = new ImageRequest(url,
+                new Response.Listener<Bitmap>(){
+                    @Override
+                    public void onResponse(Bitmap response) {
+                        imageView.setImageBitmap(response);
+                        TextView answerLabel = findViewById(R.id.answerLabel);
+                        answerLabel.setText("I didn't mess up");
+
+                    }
+                }, 700,700, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
+                new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                TextView answerLabel = findViewById(R.id.answerLabel);
+                answerLabel.setText("I messed up");
+
+
+                }
+
+
+        });
+        requestQueue.add(imageRequest);
+
+
+    }
+
+
+
 
     /**
      * Run when our activity comes into view.
@@ -139,27 +211,27 @@ public class GameActivity extends AppCompatActivity {
         //Load main layout
         setContentView(R.layout.activity_game);
 
-        //attach handler to UI button
-
-        final Button startAPICall = findViewById(R.id.startAPICall);
-
-        startAPICall.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(final View v) {
-
-                Log.d(TAG, "Start API button clicked");
-                startAPICall();
-            }
-
-        });
+//        //attach handler to UI button
+//
+//        final Button startAPICall = findViewById(R.id.startAPICall);
+//
+//        startAPICall.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(final View v) {
+//
+//                Log.d(TAG, "Start API button clicked");
+//                startAPICall();
+//            }
+//
+//        });
 
         //make sure progress bar isn’t spinning (deleted)
 
     }
 
 
-    //Make API call
+
 
 
 }
