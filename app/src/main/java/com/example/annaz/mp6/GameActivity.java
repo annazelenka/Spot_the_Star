@@ -45,7 +45,7 @@ public class GameActivity extends AppCompatActivity {
     private String[] celebNames = {"Kanye West", "Kylie Jenner", "Angelina Jolie", "Geoff Challen",
             "Rihanna", "Beyoncé", "Brad Pitt", "Justin Bieber", "Kim Kardashian", "Selena Gomez"};
 
-    private String geoffURL = "https://www.bluegroup.systems/people/challen@buffalo.edu/xphoto.jpg.pagespeed.ic.tfnNawc0a2.jpg";
+    private String geoffURL = "https://cs.illinois.edu/sites/default/files/images/Geoffrey_Challen.jpg";
 
     private String currentCeleb;
     private int currentArrValue = 0;
@@ -54,7 +54,7 @@ public class GameActivity extends AppCompatActivity {
 
     private TextView time;
     private TextView textViewCountDown;
-    private static long COUNTDOWN_IN_MILLIS = 3000000;
+    private static long COUNTDOWN_IN_MILLIS = 60000;
 
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis;
@@ -71,7 +71,12 @@ public class GameActivity extends AppCompatActivity {
 
             if (currentArrValue >= celebNames.length) {
                 currentArrValue = 0;
+                currentCeleb = celebNames[currentArrValue];
+                String celebURL = getAPIURL(currentCeleb);
+                startAPICall(celebURL);
+
             } else if (currentArrValue == 3) {
+                currentCeleb = celebNames[currentArrValue];
                 ImageView imageView = findViewById(R.id.celebImageView);
                 uploadCelebImage(geoffURL, imageView);
 
@@ -81,10 +86,11 @@ public class GameActivity extends AppCompatActivity {
                 startAPICall(celebURL);
             }
 
-            //uploadCelebImage("https://www.bluegroup.systems/people/challen@buffalo.edu/xphoto.jpg.pagespeed.ic.tfnNawc0a2.jpg", imageView);
             TextView scoreLabel = findViewById(R.id.scoreLabel);
             score++;
             scoreLabel.setText("Score: " + score);
+            EditText editText = findViewById(R.id.editText);
+            editText.setText("");
 
         }
 
@@ -107,6 +113,7 @@ public class GameActivity extends AppCompatActivity {
             } else if (currentCeleb.trim().toLowerCase().equals(userAnswer)) {
                 return true;
             }
+
 
         }
 
@@ -133,20 +140,7 @@ public class GameActivity extends AppCompatActivity {
     private static RequestQueue requestQueue;
 
     void startAPICall(String celebURL) {
-        String celebURL4 =
-                "https://en.wikipedia.org/" +
-                        "w/api.php?action=query&titles=Albert%20Einstein&format=json&prop=images";
-        String celebURL2 = "https://en.wikipedia.org/w/api.php?action=query" +
-                "&prop=pageimages&format=json&piprop=original&titles=Albert%20Einstein";
 
-        //change height by changing 60!!
-        String celebURL3 = "https://en.wikipedia.org/w/api.php?action=query&format=" +
-                "json&formatversion=2&prop=pageimages|pageterms&piprop=thumbnail&pithumbsize=" +
-
-                //60 = current height!
-                "60&titles=Albert%20Einstein";
-
-        String rihannaURL = "https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=Rihanna";
 
 
         try {
@@ -209,6 +203,15 @@ public class GameActivity extends AppCompatActivity {
     //modified code from https://stackoverflow.com/questions/48379771/android-volley-api-imagerequest-is-not-working
     public void uploadCelebImage(String url, final ImageView imageView) {
 
+        ImageView.ScaleType scaleType = ImageView.ScaleType.CENTER_CROP;
+        int width = 700;
+
+//        if (currentCeleb != null && currentCeleb.equals("Geoff Challen")) {
+//            //scaleType = ImageView.ScaleType.FIT_CENTER;
+//            width = 1500;
+//
+//        }
+
         try {
             ImageRequest imageRequest = new ImageRequest(url,
                     new Response.Listener<Bitmap>() {
@@ -219,7 +222,7 @@ public class GameActivity extends AppCompatActivity {
                             //answerLabel.setText("I didn't mess up");
 
                         }
-                    }, 700, 700, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
+                    }, width, width, scaleType, Bitmap.Config.ARGB_8888,
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
