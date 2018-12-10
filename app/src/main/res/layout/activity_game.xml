@@ -70,18 +70,19 @@
         android:onClick="guessFunction"
         android:text="guess!"
         android:textSize="25dp"
-        app:layout_constraintBottom_toTopOf="@+id/answerLabel"
+        app:layout_constraintBottom_toTopOf="@+id/editText"
         app:layout_constraintEnd_toStartOf="@+id/textField"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textField"
         app:layout_constraintTop_toBottomOf="@+id/textField" />
 
-    <TextView
-        android:id="@+id/answerLabel"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Your answer is correct!"
-        android:textSize="25dp"
+        android:hint="make a guess!"
+        android:textSize="25sp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
