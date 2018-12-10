@@ -29,6 +29,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.ImageRequest;
 
+//so that keyboard doesn't show up
+import android.view.inputmethod.InputMethodManager;
+import android.app.Activity;
+import android.content.Context;
+
+
+
 
 
 import org.json.JSONObject;
@@ -202,28 +209,37 @@ public class GameActivity extends AppCompatActivity {
     //modified code from https://stackoverflow.com/questions/48379771/android-volley-api-imagerequest-is-not-working
     public void uploadCelebImage(String url, final ImageView imageView) {
 
-        ImageRequest imageRequest = new ImageRequest(url,
-                new Response.Listener<Bitmap>(){
-                    @Override
-                    public void onResponse(Bitmap response) {
-                        imageView.setImageBitmap(response);
-                        TextView answerLabel = findViewById(R.id.editText);
-                        //answerLabel.setText("I didn't mess up");
+        try {
+            ImageRequest imageRequest = new ImageRequest(url,
+                    new Response.Listener<Bitmap>() {
+                        @Override
+                        public void onResponse(Bitmap response) {
+                            imageView.setImageBitmap(response);
+                            TextView answerLabel = findViewById(R.id.editText);
+                            //answerLabel.setText("I didn't mess up");
 
-                    }
-                }, 700,700, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
-                new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                TextView answerLabel = findViewById(R.id.editText);
-                answerLabel.setText("I messed up");
-
-
-                }
+                        }
+                    }, 700, 700, ImageView.ScaleType.CENTER_CROP, Bitmap.Config.ARGB_8888,
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            TextView answerLabel = findViewById(R.id.editText);
+                            answerLabel.setText("I messed up");
 
 
-        });
-        requestQueue.add(imageRequest);
+                        }
+
+
+                    });
+
+            requestQueue.add(imageRequest);
+        } catch(Exception e) {
+            TextView answerLabel = findViewById(R.id.editText);
+            answerLabel.setText("there's a mistake");
+
+        }
+
+
 
 
     }
@@ -262,7 +278,7 @@ public class GameActivity extends AppCompatActivity {
 
         score = 0;
 
-
+        hideKeyboard(GameActivity.this);
 
 
     }
@@ -309,15 +325,17 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    /*public static void hideKeyboard(Activity activity) {
-        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
+    public static void hideKeyboard(Activity activity) {
+        View view = activity.findViewById(android.R.id.content);
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }*/
+    }
+
+    public void hideTextFieldKeyboard(View v) {
+        hideKeyboard(GameActivity.this);
+
+    }
 }
 

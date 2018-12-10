@@ -87,6 +87,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guessButton" />
+        app:layout_constraintTop_toBottomOf="@+id/guessButton"
+        android:onClick="hideTextFieldKeyboard"/>
 
 </android.support.constraint.ConstraintLayout>
