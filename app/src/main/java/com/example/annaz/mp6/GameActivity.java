@@ -35,15 +35,19 @@ import org.json.JSONObject;
 
 public class GameActivity extends AppCompatActivity {
 
-    private String[] celebNames = {"Kanye West", "Kylie Jenner", "Kim Kardashian", "Geoff Challen",
-            "Rihanna", "Beyoncé", "Brad Pitt", "Angelina Jolie", "Justin Bieber", "Selena Gomez"};
+    private String[] celebNames = {"Kanye West", "Kylie Jenner", "Angelina Jolie", "Geoff Challen",
+            "Rihanna", "Beyoncé", "Brad Pitt", "Justin Bieber", "Kim Kardashian", "Selena Gomez"};
+
+    private String geoffURL = "https://www.bluegroup.systems/people/challen@buffalo.edu/xphoto.jpg.pagespeed.ic.tfnNawc0a2.jpg";
 
     private String currentCeleb;
     private int currentArrValue = 0;
 
+
+
     private TextView time;
     private TextView textViewCountDown;
-    private static long COUNTDOWN_IN_MILLIS = 30000;
+    private static long COUNTDOWN_IN_MILLIS = 3000000;
 
     private CountDownTimer countDownTimer;
     private long timeLeftInMillis;
@@ -54,30 +58,27 @@ public class GameActivity extends AppCompatActivity {
 
 
     public void guessFunction(View v) { //previously titled "launchScoreScreen"
-        Intent i = new Intent(this, scoreScreen.class);
-        i.putExtra("score", score); //passes score to the next screen
-        startActivity(i);
-
-
-
 
         if (answerIsCorrect()) {
-            String celebURL = getAPIURL("Rihanna"); //make sure it's capitalized and has spaces if necessary!
-            startAPICall(celebURL);
-            ImageView imageView = findViewById(R.id.celebImageView);
+            currentArrValue += 1;
+
+            if (currentArrValue >= celebNames.length) {
+                currentArrValue = 0;
+            } else if (currentArrValue == 3) {
+                ImageView imageView = findViewById(R.id.celebImageView);
+                uploadCelebImage(geoffURL, imageView);
+
+            } else { //if it's not Geoff
+                currentCeleb = celebNames[currentArrValue];
+                String celebURL = getAPIURL(currentCeleb);
+                startAPICall(celebURL);
+            }
+
             //uploadCelebImage("https://www.bluegroup.systems/people/challen@buffalo.edu/xphoto.jpg.pagespeed.ic.tfnNawc0a2.jpg", imageView);
             TextView scoreLabel = findViewById(R.id.scoreLabel);
             score++;
             scoreLabel.setText("Score: " + score);
 
-        } else {
-
-        }
-
-        //startActivity(i);
-
-        if (timerHasEnded) { //Anna: eventually maybe we should delete this and just launch the next screen when the timer ends
-            startActivity(i);
         }
 
 
@@ -85,16 +86,26 @@ public class GameActivity extends AppCompatActivity {
 
     public boolean answerIsCorrect() {
 
+        //check challen case
+
         EditText editText = findViewById(R.id.editText);
 
         String userAnswer = editText.getText().toString().trim().toLowerCase();
 
-        if (currentCeleb != null && currentCeleb.trim().toLowerCase().equals(userAnswer)) {
-            return true;
+        if (currentCeleb != null) {
+            if (currentCeleb.equals("Geoff Challen")) {
+                if (userAnswer.equals("challen")) {
+                    return true;
+                }
+            } else if (currentCeleb.trim().toLowerCase().equals(userAnswer)) {
+                return true;
+            }
+
         }
 
         return false;
     }
+
 
     public String getAPIURL(String celeb) {
 
@@ -249,6 +260,8 @@ public class GameActivity extends AppCompatActivity {
         //set first celeb
         currentCeleb = celebNames[0];
 
+        score = 0;
+
 
 
 
@@ -296,5 +309,15 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
+    /*public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }*/
 }
 
