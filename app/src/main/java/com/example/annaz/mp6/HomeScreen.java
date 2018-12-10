@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.content.Intent;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.EditText;
+
 
 /*import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
@@ -34,6 +37,5 @@ public class HomeScreen extends AppCompatActivity {
         Intent i = new Intent(this, GameActivity.class);
         startActivity(i);
     }
-
 
 }

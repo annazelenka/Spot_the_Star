@@ -9,8 +9,17 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.ImageView;
-import 	android.graphics.Bitmap;
+import android.graphics.Bitmap;
+import android.widget.TextView;
 
+
+//CountDownTimer stuff
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.CountDownTimer;
+import java.util.Locale;
+
+//API stuff
 import com.android.volley.toolbox.Volley;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -25,6 +34,13 @@ import org.json.JSONObject;
 
 public class GameActivity extends AppCompatActivity {
 
+    private TextView time;
+    private TextView textViewCountDown;
+    private static long COUNTDOWN_IN_MILLIS = 30000;
+
+    private CountDownTimer countDownTimer;
+    private long timeLeftInMillis;
+
     private boolean timerHasEnded;
     private int score;
 
@@ -36,6 +52,8 @@ public class GameActivity extends AppCompatActivity {
         if (answerIsCorrect("rihanna")) {
             String celebURL = getAPIURL("Rihanna"); //make sure it's capitalized and has spaces if necessary!
             startAPICall(celebURL);
+            ImageView imageView = findViewById(R.id.celebImageView);
+            //uploadCelebImage("https://www.bluegroup.systems/people/challen@buffalo.edu/xphoto.jpg.pagespeed.ic.tfnNawc0a2.jpg", imageView);
             TextView scoreLabel = findViewById(R.id.scoreLabel);
             score++;
             scoreLabel.setText("Score: " + score);
@@ -196,11 +214,49 @@ public class GameActivity extends AppCompatActivity {
 
         //Load main layout
         setContentView(R.layout.activity_game);
+
+        textViewCountDown = findViewById(R.id.textView2);
+        timeLeftInMillis = COUNTDOWN_IN_MILLIS;
+        startCountDown();
+
+
+    }
+
+    private void startCountDown() {
+        countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
+            @Override public void onTick(long millisUntilFinished) {
+                timeLeftInMillis = millisUntilFinished;
+                updateCountDownText();
+            }
+
+            @Override public void onFinish() {
+                timeLeftInMillis = 0;
+                updateCountDownText();
+                countDownTimer.cancel();
+
+            }
+        }.start();
     }
 
 
+    private void updateCountDownText() {
+        int minutes = (int) (timeLeftInMillis / 1000) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+
+        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+
+        textViewCountDown.setText(timeFormatted);
+        textViewCountDown.setTextColor(Color.RED);
+    }
 
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
 
 }
 
